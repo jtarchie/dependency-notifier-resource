@@ -12,7 +12,7 @@ will download any assets associated with that version.
 
 # Usage
 
-```
+```yaml
 resource_types:
 - name: dependency-notifier
   type: docker-image
