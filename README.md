@@ -27,12 +27,12 @@ resources:
       access_token: {{github-access-token}}
       tag_grep: ^go
       repo: golang/go
-		urls:
-			- https://storage.googleapis.com/golang/:version:.linux-amd64.tar.gz 
+    urls:
+    - https://storage.googleapis.com/golang/:version:.linux-amd64.tar.gz 
 
 jobs:
 - name: get-golang
   plan:
-	- get: golang
+  - get: golang
     trigger: true
 ```
