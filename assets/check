@@ -1,0 +1,29 @@
+#!/bin/env ruby
+
+require 'json'
+require 'faraday'
+
+::Faraday.default_adapter = :httpclient
+
+payload = JSON.parse(ARGF.read)
+
+raise 'Please use one of the supported notifier formats -- `git`' unless payload.dig('source', 'git')
+
+versions = []
+
+if git = payload['source']['git']
+  require 'octokit'
+  Octokit.auto_paginate = true
+  Octokit.connection_options[:ssl] = { verify: false } if git['no_ssl_verify']
+  Octokit.configure do |c|
+    c.api_endpoint = git['api_endpoint'] if git['api_endpoint']
+    c.access_token = git.fetch('access_token')
+  end
+  versions = Octokit.tags(git.fetch('repo'))
+                    .map(&:name)
+                    .grep(/#{git.fetch('tag_grep')}/)
+end
+
+puts(versions.map do |version|
+  { version: version }
+end.to_json)

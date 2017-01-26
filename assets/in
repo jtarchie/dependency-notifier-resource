@@ -1,0 +1,20 @@
+#!/bin/env ruby
+
+require 'json'
+
+destination = ARGV.shift
+payload = JSON.parse(ARGF.read)
+
+raise 'There was no version specified' unless payload.dig('version')
+
+Dir.chdir(destination) do
+  urls = [payload['source']['urls']] unless payload['source'].fetch('urls').is_a?(Array)
+
+  urls.each do |url|
+    url_with_version = url.gsub(':version:', payload['version'].fetch('version'))
+    warn "Downloading asset from #{url_with_version}"
+    system("curl --remote-name #{url_with_version} 1>&2")
+  end
+end
+
+puts payload.to_json
